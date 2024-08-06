@@ -1,3 +1,5 @@
+/** @format */
+
 import {
   computed,
   defineComponent,
@@ -6,57 +8,57 @@ import {
   onUpdated,
   ref,
   Ref,
-} from 'vue';
-import { ItemProps, SlotProps } from './props';
+} from 'vue'
+import { ItemProps, SlotProps } from './props'
 
 const useResizeChange = (
   props: any,
   rootRef: Ref<HTMLElement | null>,
   emit: any,
 ) => {
-  let resizeObserver: ResizeObserver | null = null;
+  let resizeObserver: ResizeObserver | null = null
   const shapeKey = computed(() =>
     props.horizontal ? 'offsetWidth' : 'offsetHeight',
-  );
+  )
 
   const getCurrentSize = () => {
-    return rootRef.value ? rootRef.value[shapeKey.value] : 0;
-  };
-
-  // tell parent current size identify by unqiue key
+    return rootRef.value ? rootRef.value[shapeKey.value] : 0
+  }
+  // item 初始化或者改变通知父组件更改动态虚拟滚动类型
   const dispatchSizeChange = () => {
-    const { event, uniqueKey, hasInitial } = props;
-    emit(event, uniqueKey, getCurrentSize(), hasInitial);
-  };
+    const { event, uniqueKey, hasInitial } = props
+    emit(event, uniqueKey, getCurrentSize(), hasInitial)
+  }
 
   onMounted(() => {
     if (typeof ResizeObserver !== 'undefined') {
+      // 监听尺寸变化 初始化也会执行一次
       resizeObserver = new ResizeObserver(() => {
-        dispatchSizeChange();
-      });
-      rootRef.value && resizeObserver.observe(rootRef.value);
+        dispatchSizeChange()
+      })
+      rootRef.value && resizeObserver.observe(rootRef.value)
     }
-  });
+  })
 
   onUpdated(() => {
-    dispatchSizeChange();
-  });
+    dispatchSizeChange()
+  })
 
   onUnmounted(() => {
     if (resizeObserver) {
-      resizeObserver.disconnect();
-      resizeObserver = null;
+      resizeObserver.disconnect()
+      resizeObserver = null
     }
-  });
-};
+  })
+}
 
 export const Item = defineComponent({
   name: 'VirtualListItem',
   props: ItemProps,
   emits: ['itemResize'],
   setup(props, { emit }) {
-    const rootRef = ref<HTMLElement | null>(null);
-    useResizeChange(props, rootRef, emit);
+    const rootRef = ref<HTMLElement | null>(null)
+    useResizeChange(props, rootRef, emit)
 
     return () => {
       const {
@@ -67,38 +69,38 @@ export const Item = defineComponent({
         source,
         scopedSlots = {},
         uniqueKey,
-      } = props;
+      } = props
       const mergedProps = {
         ...extraProps,
         source,
         index,
-      };
+      }
 
       return (
         <Tag key={uniqueKey} ref={rootRef}>
           <Comp {...mergedProps} scopedSlots={scopedSlots} />
         </Tag>
-      );
-    };
+      )
+    }
   },
-});
+})
 
 export const Slot = defineComponent({
   name: 'VirtualListSlot',
   props: SlotProps,
   emits: ['slotResize'],
   setup(props, { slots, emit }) {
-    const rootRef = ref<HTMLElement | null>(null);
-    useResizeChange(props, rootRef, emit);
+    const rootRef = ref<HTMLElement | null>(null)
+    useResizeChange(props, rootRef, emit)
 
     return () => {
-      const { tag: Tag, uniqueKey } = props;
+      const { tag: Tag, uniqueKey } = props
 
       return (
         <Tag ref={rootRef} key={uniqueKey}>
           {slots.default?.()}
         </Tag>
-      );
-    };
+      )
+    }
   },
-});
+})

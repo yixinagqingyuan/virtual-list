@@ -1,8 +1,10 @@
 /**
  * props declaration for default, item and slot component
+ *
+ * @format
  */
 
-import { PropType } from 'vue';
+import { PropType } from 'vue'
 
 export const VirtualProps = {
   dataKey: {
@@ -18,7 +20,7 @@ export const VirtualProps = {
     type: [Object, Function],
     required: true,
   },
-
+  // 最多展示多少list
   keeps: {
     type: Number,
     default: 30,
@@ -109,7 +111,7 @@ export const VirtualProps = {
   itemScopedSlots: {
     type: Object,
   },
-};
+}
 
 export const ItemProps = {
   index: {
@@ -139,7 +141,7 @@ export const ItemProps = {
   scopedSlots: {
     type: Object,
   },
-};
+}
 
 export const SlotProps = {
   event: {
@@ -154,4 +156,4 @@ export const SlotProps = {
   horizontal: {
     type: Boolean,
   },
-};
+}

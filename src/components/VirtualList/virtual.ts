@@ -238,7 +238,6 @@ export default class Virtual {
     let high = this.param.uniqueIds.length
     // 接下来就要有一套算法来解决问题了，求偏移了几个
     while (low <= high) {
-      console.log(low, high)
       // this.__bsearchCalls++
       //他这个算法应该属于二分法，通过二分法去求最接近偏移量的 list条数
       // 获取二分居中内容，其实有可能跟总high 一样
@@ -369,11 +368,14 @@ export default class Virtual {
     }
 
     // 这是非固定高度
+    console.log(this.lastCalcIndex, lastIndex)
     if (this.lastCalcIndex === lastIndex) {
       //如果之前滑动到过底部，并且精准的对上过了，则返回精确的偏移量
+      // 所谓精准对上了，是在之前获取高度的时候，我已经展示过了所有的精确高度
+      // 所以当滑动到过底部的时候，getIndexOffset返回的就会是 精准的offset，因为 之前的 map 里头存了所有的精准高度
       return this.getIndexOffset(lastIndex) - this.getIndexOffset(end)
     } else {
-      //如果没有，请使用估计值
+      //如果没有，使用估计值
       return (lastIndex - end) * this.getEstimateSize()
     }
   }

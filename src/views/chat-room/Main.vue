@@ -1,131 +1,133 @@
-<script setup lang="ts">
-import { onMounted, ref, nextTick } from 'vue';
-// @ts-ignore
-import VirtualList from 'vue3-virtual-scroll-list';
-import GithubCorner from '../../components/Corner.vue';
-import Item from './Item.vue';
-import Editor from './Editor.vue';
-import Toolbar from './Toolbar.vue';
-import getSentences from '../../common/sentences';
-import { getMessages, getSids, LOAD_TYPES, getLoadType } from './util';
+<!-- @format -->
 
-const loadType = getLoadType();
+<script setup lang="ts">
+import { onMounted, ref, nextTick } from 'vue'
+// @ts-ignore
+import VirtualList from '../../components/VirtualList'
+import GithubCorner from '../../components/Corner.vue'
+import Item from './Item.vue'
+import Editor from './Editor.vue'
+import Toolbar from './Toolbar.vue'
+import getSentences from '../../common/sentences'
+import { getMessages, getSids, LOAD_TYPES, getLoadType } from './util'
+
+const loadType = getLoadType()
 const param = {
   pageSize: loadType === LOAD_TYPES.FEW ? 2 : 10,
   isFirstPageReady: false,
   isFetching: false,
-};
+}
 
-const finished = ref(loadType !== LOAD_TYPES.PAGES);
-const messages: any = ref([]);
-const overflow = ref(false);
-const vsl = ref();
+const finished = ref(loadType !== LOAD_TYPES.PAGES)
+const messages: any = ref([])
+const overflow = ref(false)
+const vsl = ref()
 
 onMounted(() => {
   if (loadType !== LOAD_TYPES.EMPTY) {
     // first page request
     getMessages(param.pageSize).then((newMessages: any) => {
-      messages.value = messages.value.concat(newMessages);
-    });
+      messages.value = messages.value.concat(newMessages)
+    })
   }
-});
+})
 
 const setVirtualListToBottom = () => {
   if (vsl.value) {
-    vsl.value.scrollToBottom();
+    vsl.value.scrollToBottom()
   }
-};
+}
 
 const onSendMessage = (message: any) => {
-  messages.value.push(message);
+  messages.value.push(message)
   nextTick(() => {
-    setVirtualListToBottom();
-  });
-};
+    setVirtualListToBottom()
+  })
+}
 
 const addItemClass = (index: number) => {
   return messages.value[index] && messages.value[index].isCreator
     ? 'creator'
-    : '';
-};
+    : ''
+}
 
 // mock received message
 const receivedRandomMessage = () => {
   getMessages(1).then((val) => {
-    messages.value = messages.value.concat(val);
+    messages.value = messages.value.concat(val)
     nextTick(() => {
-      setVirtualListToBottom();
-    });
-  });
-};
+      setVirtualListToBottom()
+    })
+  })
+}
 
 // mock send message
 const sendRandomMessage = (message: any) => {
-  message.content = getSentences();
-  onSendMessage(message);
-};
+  message.content = getSentences()
+  onSendMessage(message)
+}
 
 const checkOverFlow = () => {
   if (vsl.value) {
-    overflow.value = vsl.value.getScrollSize() > vsl.value.getClientSize();
+    overflow.value = vsl.value.getScrollSize() > vsl.value.getClientSize()
   }
-};
+}
 
 const onItemRendered = () => {
   if (!vsl.value) {
-    return;
+    return
   }
 
   // first page items are all mounted, scroll to bottom
   if (!param.isFirstPageReady && vsl.value.getSizes() >= param.pageSize) {
-    param.isFirstPageReady = true;
-    setVirtualListToBottom();
+    param.isFirstPageReady = true
+    setVirtualListToBottom()
   }
 
-  checkOverFlow();
-};
+  checkOverFlow()
+}
 
 const setVirtualListToOffset = (offset: number) => {
   if (vsl.value) {
-    vsl.value.scrollToOffset(offset);
+    vsl.value.scrollToOffset(offset)
   }
-};
+}
 
 const onTotop = () => {
   // only page type has paging
   if (getLoadType() !== LOAD_TYPES.PAGES || param.isFetching) {
-    return;
+    return
   }
 
-  param.isFetching = true;
+  param.isFetching = true
 
   // get next page
   getMessages(param.pageSize, true).then((msgs: any) => {
     if (!msgs.length) {
-      finished.value = true;
-      return;
+      finished.value = true
+      return
     }
 
-    const sids = getSids(msgs);
-    messages.value = msgs.concat(messages.value);
+    const sids = getSids(msgs)
+    messages.value = msgs.concat(messages.value)
     nextTick(() => {
       const offset = sids.reduce((previousValue: any, currentSid: any) => {
         const previousSize =
           typeof previousValue === 'string'
             ? vsl.value.getSize(previousValue)
-            : previousValue;
-        return previousSize + vsl.value.getSize(currentSid);
-      });
-      setVirtualListToOffset(offset);
+            : previousValue
+        return previousSize + vsl.value.getSize(currentSid)
+      })
+      setVirtualListToOffset(offset)
 
-      param.isFetching = false;
-    });
-  });
-};
+      param.isFetching = false
+    })
+  })
+}
 
 const jump = () => {
-  vsl.value.scrollToIndex(2);
-};
+  vsl.value.scrollToIndex(2)
+}
 </script>
 
 <template>

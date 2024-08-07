@@ -1,60 +1,62 @@
-<script setup lang="ts">
-import { ref } from 'vue';
-import { Random } from 'mockjs';
-// @ts-ignore
-import VirtualList from 'vue3-virtual-scroll-list';
+<!-- @format -->
 
-import GithubCorner from '../../components/Corner.vue';
-import Introduction from '../../components/Introduction.vue';
-import Tab from '../../components/Tab.vue';
-import CodeBlock from './Code.vue';
-import Item from './Item.vue';
-import { TAB_TYPE, DEFAULT_TAB } from '../../common/const';
-import getSentences from '../../common/sentences';
-import genUniqueId from '../../common/gen-unique-id';
+<script setup lang="ts">
+import { ref } from 'vue'
+import { Random } from 'mockjs'
+// @ts-ignore
+import VirtualList from '../../components/VirtualList'
+
+import GithubCorner from '../../components/Corner.vue'
+import Introduction from '../../components/Introduction.vue'
+import Tab from '../../components/Tab.vue'
+import CodeBlock from './Code.vue'
+import Item from './Item.vue'
+import { TAB_TYPE, DEFAULT_TAB } from '../../common/const'
+import getSentences from '../../common/sentences'
+import genUniqueId from '../../common/gen-unique-id'
 
 const getPageData = (count: number, currentLength: number) => {
-  const DataItems = [];
+  const DataItems = []
   for (let i = 0; i < count; i++) {
-    const index = currentLength + i;
+    const index = currentLength + i
     DataItems.push({
       index,
       name: Random.name(),
       id: genUniqueId(index),
       desc: getSentences(),
-    });
+    })
   }
-  return DataItems;
-};
+  return DataItems
+}
 
-const pageSize = 20;
-const items = ref(getPageData(pageSize, 0));
+const pageSize = 20
+const items = ref(getPageData(pageSize, 0))
 
-const isShowView = ref(DEFAULT_TAB === TAB_TYPE.VIEW);
+const isShowView = ref(DEFAULT_TAB === TAB_TYPE.VIEW)
 const onTabChange = (type: TAB_TYPE) => {
-  isShowView.value = type === TAB_TYPE.VIEW;
-};
+  isShowView.value = type === TAB_TYPE.VIEW
+}
 
-const isLoading = ref(false);
+const isLoading = ref(false)
 
 const onScrollToTop = () => {
-  console.log('at top');
-};
+  console.log('at top')
+}
 
 const onScrollToBottom = () => {
-  console.log('at bottom');
+  console.log('at bottom')
 
   if (isLoading.value) {
-    return;
+    return
   }
 
-  isLoading.value = true;
+  isLoading.value = true
 
   setTimeout(() => {
-    isLoading.value = false;
-    items.value = items.value.concat(getPageData(pageSize, items.value.length));
-  }, 500);
-};
+    isLoading.value = false
+    items.value = items.value.concat(getPageData(pageSize, items.value.length))
+  }, 500)
+}
 </script>
 
 <template>
